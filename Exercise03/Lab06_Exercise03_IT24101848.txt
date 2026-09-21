@@ -1,0 +1,90 @@
+SE3082 - PARALLEL COMPUTING LAB 06 - EXERCISE 03 OpenMP Master Directive
+
+Registration Number: IT24101848 Name: Perera H.L.P.S
+
+============================================================ 1. SOURCE
+CODE ============================================================
+
+#include <omp.h> #include <stdio.h>
+
+int main() { #pragma omp parallel { int th = omp_get_thread_num();
+
+        printf("thread # %d\n", th);
+
+        #pragma omp master
+        {
+            printf("Inside Master # %d\n", omp_get_thread_num());
+            printf("Exiting Master\n");
+        }
+
+        printf("Hi again from thread # %d\n", omp_get_thread_num());
+    }
+
+    return 0;
+
+}
+
+============================================================ 2.
+COMPILATION ============================================================
+
+Environment: Amazon Linux 2023
+
+Compilation command: gcc -fopenmp -Wall -Wextra exercise03.c -o
+exercise03
+
+Compilation result: Successful. No compiler errors or warnings were
+displayed.
+
+Executable: exercise03
+
+============================================================ 3.
+EXECUTION WITH 2 THREADS
+============================================================
+
+Command: OMP_NUM_THREADS=2 ./exercise03
+
+Output: thread # 1 Hi again from thread # 1 thread # 0 Inside Master # 0
+Exiting Master Hi again from thread # 0
+
+============================================================ 4.
+EXECUTION WITH 4 THREADS
+============================================================
+
+Command: OMP_NUM_THREADS=4 ./exercise03
+
+Output: thread # 3 Hi again from thread # 3 thread # 2 Hi again from
+thread # 2 thread # 1 Hi again from thread # 1 thread # 0 Inside Master
+# 0 Exiting Master Hi again from thread # 0
+
+============================================================ 5.
+DESCRIPTION OF #pragma omp master
+============================================================
+
+#pragma omp master specifies that the associated structured block is
+executed only by the master thread of the OpenMP team. The master thread
+is thread 0.
+
+In the actual results of this exercise, the line:
+
+Inside Master # 0
+
+appears in both the 2-thread and 4-thread executions. This confirms that
+only thread 0 executed the master section.
+
+Unlike the OpenMP single construct, the master construct does not have
+an implicit barrier at its end. Therefore, the other threads do not have
+to wait for the master thread to complete the master block before they
+continue with their following statements.
+
+This behavior is visible in the actual output. For example, in the
+4-thread run, threads 3, 2, and 1 printed their “Hi again” messages
+before thread 0 entered and completed the master section.
+
+============================================================ 6. RESULT
+============================================================
+
+Exercise 03 compiled and executed successfully on Amazon Linux using
+OpenMP. The program was tested with 2 and 4 threads. In both runs, only
+thread 0 executed the #pragma omp master block. The observed output also
+demonstrates that there is no implicit barrier at the end of the master
+construct.

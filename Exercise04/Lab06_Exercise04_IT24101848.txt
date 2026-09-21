@@ -1,0 +1,130 @@
+SE3082 - PARALLEL COMPUTING LAB 06 - EXERCISE 04 OpenMP Parallel For and
+collapse(2)
+
+Registration Number: IT24101848 Name: Perera H.L.P.S
+
+============================================================ 1. SOURCE
+CODE - PARALLEL FOR
+============================================================
+
+#include <omp.h> #include <stdio.h>
+
+int main() { #pragma omp parallel for for (int r = 1; r <= 5; r++) { for
+(int k = 1; k <= 10; k++) { printf(“r = %d, k = %d, thread # = %d”, r,
+k, omp_get_thread_num()); } }
+
+    return 0;
+
+}
+
+============================================================ 2. SOURCE
+CODE - PARALLEL FOR WITH collapse(2)
+============================================================
+
+#include <omp.h> #include <stdio.h>
+
+int main() { #pragma omp parallel for collapse(2) for (int r = 1; r <=
+5; r++) { for (int k = 1; k <= 10; k++) { printf(“r = %d, k = %d, thread
+# = %d”, r, k, omp_get_thread_num()); } }
+
+    return 0;
+
+}
+
+============================================================ 3.
+COMPILATION ============================================================
+
+Environment: Amazon Linux 2023
+
+Commands: gcc -fopenmp -Wall -Wextra exercise04.c -o exercise04 gcc
+-fopenmp -Wall -Wextra exercise04_collapse.c -o exercise04_collapse
+
+Compilation result: Both programs compiled successfully. No compiler
+errors or warnings were displayed.
+
+============================================================ 4. OUTPUT -
+#pragma omp parallel for (4 THREADS)
+============================================================
+
+Command: OMP_NUM_THREADS=4 ./exercise04
+
+Output: r = 3, k = 1, thread # = 1 r = 3, k = 2, thread # = 1 r = 3, k =
+3, thread # = 1 r = 3, k = 4, thread # = 1 r = 3, k = 5, thread # = 1 r
+= 3, k = 6, thread # = 1 r = 3, k = 7, thread # = 1 r = 3, k = 8, thread
+# = 1 r = 3, k = 9, thread # = 1 r = 3, k = 10, thread # = 1 r = 4, k =
+1, thread # = 2 r = 4, k = 2, thread # = 2 r = 4, k = 3, thread # = 2 r
+= 4, k = 4, thread # = 2 r = 4, k = 5, thread # = 2 r = 4, k = 6, thread
+# = 2 r = 4, k = 7, thread # = 2 r = 4, k = 8, thread # = 2 r = 4, k =
+9, thread # = 2 r = 4, k = 10, thread # = 2 r = 5, k = 1, thread # = 3 r
+= 5, k = 2, thread # = 3 r = 5, k = 3, thread # = 3 r = 5, k = 4, thread
+# = 3 r = 1, k = 1, thread # = 0 r = 5, k = 5, thread # = 3 r = 1, k =
+2, thread # = 0 r = 5, k = 6, thread # = 3 r = 1, k = 3, thread # = 0 r
+= 5, k = 7, thread # = 3 r = 1, k = 4, thread # = 0 r = 1, k = 5, thread
+# = 0 r = 1, k = 6, thread # = 0 r = 1, k = 7, thread # = 0 r = 1, k =
+8, thread # = 0 r = 1, k = 9, thread # = 0 r = 1, k = 10, thread # = 0 r
+= 2, k = 1, thread # = 0 r = 2, k = 2, thread # = 0 r = 2, k = 3, thread
+# = 0 r = 2, k = 4, thread # = 0 r = 2, k = 5, thread # = 0 r = 2, k =
+6, thread # = 0 r = 2, k = 7, thread # = 0 r = 2, k = 8, thread # = 0 r
+= 2, k = 9, thread # = 0 r = 2, k = 10, thread # = 0 r = 5, k = 8,
+thread # = 3 r = 5, k = 9, thread # = 3 r = 5, k = 10, thread # = 3
+
+============================================================ 5. OUTPUT -
+collapse(2) (4 THREADS)
+============================================================
+
+Command: OMP_NUM_THREADS=4 ./exercise04_collapse
+
+Output: r = 2, k = 4, thread # = 1 r = 2, k = 5, thread # = 1 r = 2, k =
+6, thread # = 1 r = 2, k = 7, thread # = 1 r = 2, k = 8, thread # = 1 r
+= 2, k = 9, thread # = 1 r = 2, k = 10, thread # = 1 r = 3, k = 1,
+thread # = 1 r = 3, k = 2, thread # = 1 r = 3, k = 3, thread # = 1 r =
+3, k = 4, thread # = 1 r = 3, k = 5, thread # = 1 r = 3, k = 6, thread #
+= 1 r = 3, k = 7, thread # = 2 r = 3, k = 8, thread # = 2 r = 3, k = 9,
+thread # = 2 r = 3, k = 10, thread # = 2 r = 4, k = 1, thread # = 2 r =
+4, k = 2, thread # = 2 r = 4, k = 3, thread # = 2 r = 4, k = 4, thread #
+= 2 r = 4, k = 5, thread # = 2 r = 4, k = 6, thread # = 2 r = 4, k = 7,
+thread # = 2 r = 4, k = 8, thread # = 2 r = 4, k = 9, thread # = 3 r =
+4, k = 10, thread # = 3 r = 5, k = 1, thread # = 3 r = 5, k = 2, thread
+# = 3 r = 5, k = 3, thread # = 3 r = 5, k = 4, thread # = 3 r = 5, k =
+5, thread # = 3 r = 5, k = 6, thread # = 3 r = 5, k = 7, thread # = 3 r
+= 5, k = 8, thread # = 3 r = 5, k = 9, thread # = 3 r = 5, k = 10,
+thread # = 3 r = 1, k = 1, thread # = 0 r = 1, k = 2, thread # = 0 r =
+1, k = 3, thread # = 0 r = 1, k = 4, thread # = 0 r = 1, k = 5, thread #
+= 0 r = 1, k = 6, thread # = 0 r = 1, k = 7, thread # = 0 r = 1, k = 8,
+thread # = 0 r = 1, k = 9, thread # = 0 r = 1, k = 10, thread # = 0 r =
+2, k = 1, thread # = 0 r = 2, k = 2, thread # = 0 r = 2, k = 3, thread #
+= 0
+
+============================================================ 6.
+OBSERVATION AND COMPARISON
+============================================================
+
+Without collapse(2), OpenMP parallelizes the outer r loop. There are
+five outer-loop iterations. In the observed output, thread 0 handled r =
+1 and r = 2, thread 1 handled r = 3, thread 2 handled r = 4, and thread
+3 handled r = 5. Each thread then executed all ten k iterations
+belonging to its assigned r value.
+
+With collapse(2), OpenMP combines the two nested loops into one logical
+iteration space. Since r has 5 iterations and k has 10 iterations, the
+combined iteration space contains 5 x 10 = 50 iterations.
+
+The actual collapse(2) output demonstrates finer-grained distribution.
+For example, r = 2 is divided between thread 0 and thread 1, r = 3 is
+divided between thread 1 and thread 2, and r = 4 is divided between
+thread 2 and thread 3. Therefore, the work is no longer distributed only
+as complete outer-loop iterations.
+
+The order of printed lines is not guaranteed because multiple OpenMP
+threads execute concurrently.
+
+============================================================ 7. RESULT
+============================================================
+
+Exercise 04 was compiled and executed successfully on Amazon Linux using
+OpenMP with four threads.
+
+The #pragma omp parallel for version distributed the five outer-loop
+iterations among the threads. The collapse(2) version combined both
+nested loops into a 50-iteration logical iteration space, resulting in
+finer-grained work distribution across the four threads.

@@ -1,0 +1,246 @@
+SE3082 - PARALLEL COMPUTING LAB 06 - EXERCISE 06 Strip-Mined Array
+Multiplication Using OpenMP
+
+Registration Number: IT24101848 Name: Perera H.L.P.S
+
+============================================================ 1. SOURCE
+CODE ============================================================
+
+#include <omp.h> #include <stdio.h> #include <stdlib.h>
+
+#define N 1000000 #define STRIP_SIZE 1024
+
+int main() { double A = (double )malloc(N * sizeof(double)); double B =
+(double )malloc(N * sizeof(double)); double C = (double )malloc(N *
+sizeof(double));
+
+    if (A == NULL || B == NULL || C == NULL)
+    {
+        printf("Memory allocation failed.\n");
+        free(A);
+        free(B);
+        free(C);
+        return 1;
+    }
+
+    /* Initialize the arrays */
+    for (int i = 0; i < N; i++)
+    {
+        A[i] = (double)i;
+        B[i] = 2.0;
+    }
+
+    double start = omp_get_wtime();
+
+    /*
+     * Strip-mined parallel multiplication.
+     * Each outer-loop iteration represents one strip.
+     */
+    #pragma omp parallel for schedule(static)
+    for (int start_index = 0;
+         start_index < N;
+         start_index += STRIP_SIZE)
+    {
+        int end_index = start_index + STRIP_SIZE;
+
+        if (end_index > N)
+        {
+            end_index = N;
+        }
+
+        #pragma omp simd
+        for (int i = start_index; i < end_index; i++)
+        {
+            C[i] = A[i] * B[i];
+        }
+    }
+
+    double end = omp_get_wtime();
+
+    /* Verify the result */
+    int correct = 1;
+
+    for (int i = 0; i < N; i++)
+    {
+        if (C[i] != A[i] * B[i])
+        {
+            correct = 0;
+            break;
+        }
+    }
+
+    printf("Array size = %d\n", N);
+    printf("Strip size = %d\n", STRIP_SIZE);
+    printf("Threads = %d\n", omp_get_max_threads());
+    printf("Execution time = %.6f seconds\n", end - start);
+
+    if (correct)
+    {
+        printf("Verification = PASSED\n");
+    }
+    else
+    {
+        printf("Verification = FAILED\n");
+    }
+
+    printf("\nSample results:\n");
+
+    for (int i = 0; i < 10; i++)
+    {
+        printf("A[%d] = %.1f, B[%d] = %.1f, C[%d] = %.1f\n",
+               i, A[i], i, B[i], i, C[i]);
+    }
+
+    free(A);
+    free(B);
+    free(C);
+
+    return 0;
+
+}
+
+============================================================ 2.
+COMPILATION ============================================================
+
+Environment: Amazon Linux 2023
+
+Compilation command: gcc -O2 -fopenmp -Wall -Wextra exercise06.c -o
+exercise06
+
+Compilation result: Successful. No compiler errors or warnings were
+displayed.
+
+============================================================ 3. FINAL
+EXECUTION RESULTS
+============================================================
+
+Array size: 1,000,000 Strip size: 1024
+
+  ----------
+  1 THREAD
+  ----------
+
+Command: OMP_NUM_THREADS=1 ./exercise06
+
+Output: Array size = 1000000 Strip size = 1024 Threads = 1 Execution
+time = 0.005046 seconds Verification = PASSED
+
+Sample results: A[0] = 0.0, B[0] = 2.0, C[0] = 0.0 A[1] = 1.0, B[1] =
+2.0, C[1] = 2.0 A[2] = 2.0, B[2] = 2.0, C[2] = 4.0 A[3] = 3.0, B[3] =
+2.0, C[3] = 6.0 A[4] = 4.0, B[4] = 2.0, C[4] = 8.0 A[5] = 5.0, B[5] =
+2.0, C[5] = 10.0 A[6] = 6.0, B[6] = 2.0, C[6] = 12.0 A[7] = 7.0, B[7] =
+2.0, C[7] = 14.0 A[8] = 8.0, B[8] = 2.0, C[8] = 16.0 A[9] = 9.0, B[9] =
+2.0, C[9] = 18.0
+
+  -----------
+  2 THREADS
+  -----------
+
+Command: OMP_NUM_THREADS=2 ./exercise06
+
+Output: Array size = 1000000 Strip size = 1024 Threads = 2 Execution
+time = 0.003956 seconds Verification = PASSED
+
+Sample results: A[0] = 0.0, B[0] = 2.0, C[0] = 0.0 A[1] = 1.0, B[1] =
+2.0, C[1] = 2.0 A[2] = 2.0, B[2] = 2.0, C[2] = 4.0 A[3] = 3.0, B[3] =
+2.0, C[3] = 6.0 A[4] = 4.0, B[4] = 2.0, C[4] = 8.0 A[5] = 5.0, B[5] =
+2.0, C[5] = 10.0 A[6] = 6.0, B[6] = 2.0, C[6] = 12.0 A[7] = 7.0, B[7] =
+2.0, C[7] = 14.0 A[8] = 8.0, B[8] = 2.0, C[8] = 16.0 A[9] = 9.0, B[9] =
+2.0, C[9] = 18.0
+
+  -----------
+  4 THREADS
+  -----------
+
+Command: OMP_NUM_THREADS=4 ./exercise06
+
+Output: Array size = 1000000 Strip size = 1024 Threads = 4 Execution
+time = 0.004776 seconds Verification = PASSED
+
+Sample results: A[0] = 0.0, B[0] = 2.0, C[0] = 0.0 A[1] = 1.0, B[1] =
+2.0, C[1] = 2.0 A[2] = 2.0, B[2] = 2.0, C[2] = 4.0 A[3] = 3.0, B[3] =
+2.0, C[3] = 6.0 A[4] = 4.0, B[4] = 2.0, C[4] = 8.0 A[5] = 5.0, B[5] =
+2.0, C[5] = 10.0 A[6] = 6.0, B[6] = 2.0, C[6] = 12.0 A[7] = 7.0, B[7] =
+2.0, C[7] = 14.0 A[8] = 8.0, B[8] = 2.0, C[8] = 16.0 A[9] = 9.0, B[9] =
+2.0, C[9] = 18.0
+
+============================================================ 4.
+EXECUTION TIME COMPARISON
+============================================================
+
+  Threads   Execution Time (seconds)   Verification
+  --------- -------------------------- --------------
+  1         0.005046                   PASSED
+  2         0.003956                   PASSED
+  4         0.004776                   PASSED
+
+The 2-thread execution was the fastest of the three measured runs.
+
+Compared with the 1-thread run: 1-thread time = 0.005046 seconds
+2-thread time = 0.003956 seconds
+
+Approximate speedup for 2 threads: 0.005046 / 0.003956 = 1.28 times
+
+The 4-thread execution was faster than the 1-thread execution in this
+run, but slower than the 2-thread execution.
+
+============================================================ 5.
+DESCRIPTION OF STRIP MINING AND OPENMP
+============================================================
+
+The program contains arrays A, B, and C with 1,000,000 elements. Each
+output element is calculated as:
+
+C[i] = A[i] * B[i]
+
+The array is divided into fixed-size strips of 1024 elements. The outer
+loop moves through the array one strip at a time.
+
+#pragma omp parallel for schedule(static)
+
+parallelizes the strip loop. With static scheduling, the strip
+iterations are divided among the OpenMP threads using a predetermined
+distribution.
+
+#pragma omp simd
+
+is applied to the inner loop within each strip. It tells the compiler
+that the iterations are suitable for SIMD/vector execution when the
+target architecture and compiler permit it.
+
+omp_get_wtime()
+
+is used to measure the elapsed time of the multiplication section.
+
+============================================================ 6.
+OBSERVATIONS
+============================================================
+
+All executions passed verification, confirming that the parallel
+calculation produced the expected array values.
+
+The measured final times were:
+
+1 thread = 0.005046 seconds 2 threads = 0.003956 seconds 4 threads =
+0.004776 seconds
+
+The 2-thread configuration produced the lowest measured execution time.
+The 4-thread configuration did not improve on the 2-thread result.
+
+This is reasonable for a small and memory-oriented computation.
+Increasing the thread count introduces OpenMP scheduling and thread
+management overhead, while array multiplication also depends heavily on
+memory access. Execution times can also vary between runs because of
+operating-system scheduling and the EC2 environment.
+
+============================================================ 7. RESULT
+============================================================
+
+Exercise 06 compiled and executed successfully on Amazon Linux using
+OpenMP.
+
+The strip-mined multiplication processed 1,000,000 array elements using
+a strip size of 1024. Verification passed with 1, 2, and 4 threads. In
+the final measured run, the 2-thread configuration was the fastest at
+0.003956 seconds, compared with 0.005046 seconds for 1 thread and
+0.004776 seconds for 4 threads.

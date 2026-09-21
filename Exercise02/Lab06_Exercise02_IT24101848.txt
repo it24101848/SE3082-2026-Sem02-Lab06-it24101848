@@ -1,0 +1,79 @@
+SE3082 - PARALLEL COMPUTING LAB 06 - EXERCISE 02 OpenMP Single Directive
+
+Registration Number: IT24101848 Name: Perera H.L.P.S
+
+============================================================ 1. SOURCE
+CODE ============================================================
+
+#include <omp.h> #include <stdio.h>
+
+int main() {
+
+#pragma omp parallel { int th = omp_get_thread_num(); printf(“thread #
+%d”, th);
+
+#pragma omp single { printf(“Inside Single # %d”, omp_get_thread_num());
+printf(“Exiting Single ”); } printf(“Hi again from thread # %d”,
+omp_get_thread_num());
+
+} return 0; }
+
+============================================================ 2.
+COMPILATION ============================================================
+
+Environment: Amazon Linux 2023
+
+Compilation command: gcc -fopenmp -Wall -Wextra exercise02.c -o
+exercise02
+
+Compilation result: Successful. No compiler errors or warnings were
+displayed.
+
+Executable: exercise02
+
+============================================================ 3.
+EXECUTION WITH 2 THREADS
+============================================================
+
+Command: OMP_NUM_THREADS=2 ./exercise02
+
+Output: thread # 1 Inside Single # 1 Exiting Single thread # 0 Hi again
+from thread # 1 Hi again from thread # 0
+
+============================================================ 4.
+EXECUTION WITH 4 THREADS
+============================================================
+
+Command: OMP_NUM_THREADS=4 ./exercise02
+
+Output: thread # 1 Inside Single # 1 Exiting Single thread # 2 thread #
+3 thread # 0 Hi again from thread # 1 Hi again from thread # 2 Hi again
+from thread # 3 Hi again from thread # 0
+
+============================================================ 5.
+DESCRIPTION OF #pragma omp single
+============================================================
+
+#pragma omp single specifies that the structured block associated with
+the directive is executed by only one thread in the current team.
+
+The thread that executes the single region is not required to be thread
+0. In the actual results of this exercise, thread 1 executed the single
+region in both the 2-thread and 4-thread runs.
+
+The other threads do not execute the statements inside the single block.
+Unless the nowait clause is used, an implicit barrier exists at the end
+of the single construct, so threads wait there before continuing beyond
+the construct.
+
+In the output, “Inside Single # 1” and “Exiting Single” appear only once
+in each execution, demonstrating that only one thread executes the
+single block.
+
+============================================================ 6. RESULT
+============================================================
+
+Exercise 02 compiled and executed successfully on Amazon Linux using
+OpenMP. The program was tested with 2 and 4 threads. In both runs, only
+one thread executed the #pragma omp single region, while all threads
+continued with the remaining code after the single construct.

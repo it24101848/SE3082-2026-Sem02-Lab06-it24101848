@@ -1,0 +1,80 @@
+SE3082 - PARALLEL COMPUTING LAB 06 - EXERCISE 01 OpenMP Barrier
+
+Registration Number: IT24101848 Name: Perera H.L.P.S
+
+============================================================ 1. SOURCE
+CODE ============================================================
+
+#include <omp.h> #include <stdio.h>
+
+int main() { #pragma omp parallel { int th = omp_get_thread_num();
+
+        printf("thread # %d\n", th);
+
+        #pragma omp barrier
+
+        printf("Outside Barrier # %d\n", omp_get_thread_num());
+        printf("Hi again from thread # %d\n", omp_get_thread_num());
+    }
+
+    return 0;
+
+}
+
+============================================================ 2.
+COMPILATION ============================================================
+
+Environment: Amazon Linux 2023 Compiler: gcc (GCC) 11.5.0 20240719 (Red
+Hat 11.5.0-5)
+
+Compilation command: gcc -fopenmp -Wall -Wextra exercise01.c -o
+exercise01
+
+Compilation result: Successful. No compiler errors or warnings were
+displayed.
+
+============================================================ 3.
+EXECUTION WITH 2 THREADS
+============================================================
+
+Command: OMP_NUM_THREADS=2 ./exercise01
+
+Output: thread # 1 thread # 0 Outside Barrier # 1 Hi again from thread #
+1 Outside Barrier # 0 Hi again from thread # 0
+
+============================================================ 4.
+EXECUTION WITH 4 THREADS
+============================================================
+
+Command: OMP_NUM_THREADS=4 ./exercise01
+
+Output: thread # 1 thread # 2 thread # 3 thread # 0 Outside Barrier # 1
+Hi again from thread # 1 Outside Barrier # 2 Hi again from thread # 2
+Outside Barrier # 3 Hi again from thread # 3 Outside Barrier # 0 Hi
+again from thread # 0
+
+============================================================ 5.
+DESCRIPTION OF #pragma omp barrier
+============================================================
+
+#pragma omp barrier creates a synchronization point inside an OpenMP
+parallel region. When a thread reaches the barrier, it must wait until
+all other threads in the team have also reached the same barrier. Only
+after every thread reaches the barrier can the threads continue
+executing the statements after it.
+
+In this exercise, each thread first prints its thread number. The
+barrier then makes the threads wait for one another. Therefore, all
+“thread #” messages are produced before execution continues to the
+“Outside Barrier” section.
+
+The order in which individual threads execute is not guaranteed. This
+can be seen in the output because the thread numbers do not necessarily
+appear in numerical order.
+
+============================================================ 6. RESULT
+============================================================
+
+The program compiled and executed successfully using OpenMP with both 2
+threads and 4 threads. The output demonstrates the synchronization
+behavior of the OpenMP barrier directive.

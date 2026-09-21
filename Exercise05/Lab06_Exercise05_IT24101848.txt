@@ -1,0 +1,184 @@
+SE3082 - PARALLEL COMPUTING LAB 06 - EXERCISE 05 OpenMP Task
+Parallelism - Recursive Fibonacci
+
+Registration Number: IT24101848 Name: Perera H.L.P.S
+
+============================================================ 1. SOURCE
+CODE ============================================================
+
+#include <omp.h> #include <stdio.h> #include <stdlib.h>
+
+int fib(int n) { int i, j;
+
+    if (n < 2)
+    {
+        return n;
+    }
+    else
+    {
+        #pragma omp task shared(i)
+        i = fib(n - 1);
+
+        #pragma omp task shared(j)
+        j = fib(n - 2);
+
+        #pragma omp taskwait
+
+        return i + j;
+    }
+
+}
+
+int main(int argc, char *argv[]) { int n = 20; int result = 0;
+
+    if (argc > 1)
+    {
+        n = atoi(argv[1]);
+    }
+
+    double start = omp_get_wtime();
+
+    #pragma omp parallel
+    {
+        #pragma omp single
+        {
+            result = fib(n);
+        }
+    }
+
+    double end = omp_get_wtime();
+
+    printf("Fibonacci(%d) = %d\n", n, result);
+    printf("Threads = %d\n", omp_get_max_threads());
+    printf("Execution time = %.6f seconds\n", end - start);
+
+    return 0;
+
+}
+
+============================================================ 2.
+COMPILATION ============================================================
+
+Environment: Amazon Linux 2023
+
+Compilation command: gcc -fopenmp -Wall -Wextra exercise05.c -o
+exercise05
+
+Compilation result: Successful. No compiler errors or warnings were
+displayed.
+
+============================================================ 3. FINAL
+EXECUTION RESULTS
+============================================================
+
+Input value: n = 20
+
+  ----------
+  1 THREAD
+  ----------
+
+Command: OMP_NUM_THREADS=1 ./exercise05 20
+
+Output: Fibonacci(20) = 6765 Threads = 1 Execution time = 0.001898
+seconds
+
+  -----------
+  2 THREADS
+  -----------
+
+Command: OMP_NUM_THREADS=2 ./exercise05 20
+
+Output: Fibonacci(20) = 6765 Threads = 2 Execution time = 0.013218
+seconds
+
+  -----------
+  4 THREADS
+  -----------
+
+Command: OMP_NUM_THREADS=4 ./exercise05 20
+
+Output: Fibonacci(20) = 6765 Threads = 4 Execution time = 0.013360
+seconds
+
+============================================================ 4.
+EXECUTION TIME COMPARISON
+============================================================
+
+  Threads   Fibonacci Result   Execution Time (seconds)
+  --------- ------------------ --------------------------
+  1         6765               0.001898
+  2         6765               0.013218
+  4         6765               0.013360
+
+All three executions produced the correct Fibonacci result of 6765.
+
+For this test, the 1-thread execution was faster than the 2-thread and
+4-thread executions. Increasing the number of threads did not improve
+performance for Fibonacci(20).
+
+============================================================ 5.
+DESCRIPTION OF OPENMP DIRECTIVES
+============================================================
+
+#pragma omp parallel
+
+Creates a team of OpenMP threads. These threads are available to execute
+the tasks generated during the recursive Fibonacci calculation.
+
+#pragma omp single
+
+Ensures that only one thread initially calls fib(n). Without this, every
+thread in the parallel region could start its own complete Fibonacci
+calculation.
+
+#pragma omp task shared(i)
+
+Creates an OpenMP task for calculating fib(n - 1). The variable i is
+shared so that the result produced by the task is available when the
+parent invocation continues.
+
+#pragma omp task shared(j)
+
+Creates another OpenMP task for calculating fib(n - 2). The variable j
+stores the result of this task.
+
+#pragma omp taskwait
+
+Makes the current task wait until its directly generated child tasks
+have completed. This is necessary before calculating i + j because both
+Fibonacci results must be available.
+
+============================================================ 6.
+OBSERVATION ============================================================
+
+Recursive Fibonacci exposes independent calculations, fib(n - 1) and
+fib(n - 2), which can be represented as OpenMP tasks.
+
+However, this implementation creates tasks recursively even for very
+small Fibonacci calculations. For n = 20, the cost of creating,
+scheduling, and synchronizing many small tasks is significant compared
+with the actual computation performed by each task.
+
+The measured results demonstrate this overhead:
+
+1 thread = 0.001898 seconds 2 threads = 0.013218 seconds 4 threads =
+0.013360 seconds
+
+Therefore, more threads did not automatically provide better performance
+in this experiment. Task creation and synchronization overhead dominated
+the relatively small amount of useful computation.
+
+Execution times can vary between runs depending on system scheduling and
+other runtime conditions.
+
+============================================================ 7. RESULT
+============================================================
+
+Exercise 05 compiled and executed successfully on Amazon Linux using
+OpenMP task parallelism.
+
+Fibonacci(20) produced the correct result, 6765, with 1, 2, and 4
+threads. The experiment also showed that the simple recursive task
+implementation was slower with multiple threads for this input because
+the overhead of creating and managing many small OpenMP tasks was
+greater than the performance benefit of parallel execution.
